@@ -1,5 +1,6 @@
 import client from "@/appWriteConfig";
 import { getLoginStatus } from "@/utils/authUtils";
+import { ensureUserInDB } from "@/utils/dbUtils";
 import { makeRedirectUri } from "expo-auth-session";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
@@ -13,25 +14,24 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   let account: Account = new Account(client);
   const router = useRouter();
-  
+
   async function LoginUser(email: string, password: string) {
     const loginstatus = await getLoginStatus(account);
-    if(!loginstatus){
-        try {
+    if (!loginstatus) {
+      try {
         await account.createEmailPasswordSession(email, password);
         Alert.alert("Login Successful", "Welcome!");
         setLoading(false);
-        router.replace("/")
-        } catch (e) {
+        router.replace("/");
+      } catch (e) {
         setLoading(false);
         console.error("error: " + e);
         Alert.alert("error: " + e);
-        }
-    }
-    else{
-        setLoading(false);
-        console.error("already logged in")
-        router.replace("/")
+      }
+    } else {
+      setLoading(false);
+      console.error("already logged in");
+      router.replace("/");
     }
   }
 
@@ -45,42 +45,65 @@ const LoginScreen = () => {
   };
 
   const handleGoogleLogin = async () => {
-      try {
-          const deepLink = new URL(makeRedirectUri({ preferLocalhost: true }));
-          const scheme = `${deepLink.protocol}//`;
-  
-          const loginUrl = await account.createOAuth2Token(
-              OAuthProvider.Google,
-              `${deepLink}`,
-              `${deepLink}`,
-          );
-         
-          const result = await WebBrowser.openAuthSessionAsync(`${loginUrl}`, scheme);
-          
-          if (result.type !== "success" || !result.url) {
-              Alert.alert("Error", "Google login cancelled or failed.");
-              return;
-          }
-  
-          const url = new URL(result.url);
-          const secret = url.searchParams.get("secret");
-          const userId = url.searchParams.get("userId");
-  
-          if (!secret || !userId) {
-          Alert.alert("Error", "Failed to retrieve Google login credentials.");
-          return;
-          }
-  
-          console.log(userId)
-          await account.createSession(userId, secret);
-          Alert.alert("Success", "Google login successful!");
-          router.replace("/");
-      } catch (e) {
-          console.error("Google Signup Error:", e);
-          Alert.alert("Google Signup Error", String(e));
-      }
-  };
+    try {
+      const deepLink = new URL(makeRedirectUri({ preferLocalhost: true }));
+      const scheme = `${deepLink.protocol}//`;
 
+      const loginUrl = await account.createOAuth2Token(
+        OAuthProvider.Google,
+        `${deepLink}`,
+        `${deepLink}`
+      );
+
+      const result = await WebBrowser.openAuthSessionAsync(
+        `${loginUrl}`,
+        scheme
+      );
+
+      if (result.type !== "success" || !result.url) {
+        Alert.alert("Error", "Google login cancelled or failed.");
+        return;
+      }
+
+      const url = new URL(result.url);
+      const secret = url.searchParams.get("secret");
+      const userId = url.searchParams.get("userId");
+
+      if (!secret || !userId) {
+        Alert.alert("Error", "Failed to retrieve Google login credentials.");
+        return;
+      }
+
+      await account.createSession(userId, secret);
+      Alert.alert("Success", "Google login successful!");
+
+      try {
+        const useracc = await account.get();
+        const username = (useracc.name as string) ?? "";
+        const email = (useracc.email as string) ?? "";
+        const phone = (useracc.phone as string) ?? "";
+        const verified: boolean =
+          (useracc.emailVerification as boolean) ?? false;
+
+        const parts = username.split(" ").filter(Boolean);
+        const first_name = parts.length > 0 ? parts[0] : "";
+        const last_name = parts.length > 1 ? parts.slice(1).join(" ") : "";
+        await ensureUserInDB(userId, {
+          first_name,
+          last_name,
+          email,
+          phone,
+          verified,
+        });
+      } catch (dbErr) {
+        console.error("Failed to ensure Google user in DB:", dbErr);
+      }
+      router.replace("/");
+    } catch (e) {
+      console.error("Google Signup Error:", e);
+      Alert.alert("Google Signup Error", String(e));
+    }
+  };
   return (
     <View className="flex-1 justify-center items-center bg-white px-4">
       <Text className="text-3xl font-bold mb-8">Login</Text>
@@ -115,7 +138,9 @@ const LoginScreen = () => {
         onPress={handleGoogleLogin}
         disabled={loading}
       >
-        <Text className="text-white text-lg font-bold">Continue with Google</Text>
+        <Text className="text-white text-lg font-bold">
+          Continue with Google
+        </Text>
       </TouchableOpacity>
     </View>
   );

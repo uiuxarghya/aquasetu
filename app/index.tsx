@@ -38,6 +38,14 @@ export default function Index() {
               }
             }}
           />
+          <View className="mb-5 mt-5">
+            <Button
+              title="Profile"
+              onPress={() => {
+                router.push("/(tabs)/profile");
+              }}
+            />
+          </View>
         </View>
       ) : (
         <View>
