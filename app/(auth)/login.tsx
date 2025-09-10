@@ -1,6 +1,6 @@
-import client from "@/appWriteConfig";
-import { getLoginStatus } from "@/utils/authUtils";
-import { ensureUserInDB } from "@/utils/dbUtils";
+import client from "@/lib/appwrite.config";
+import { getLoginStatus, getAppScheme } from "@/lib/utils/auth";
+import { ensureUserInDB } from "@/lib/utils/db";
 import { makeRedirectUri } from "expo-auth-session";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
@@ -12,25 +12,29 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  let account: Account = new Account(client);
+  const account = new Account(client);
   const router = useRouter();
 
   async function LoginUser(email: string, password: string) {
     const loginstatus = await getLoginStatus(account);
     if (!loginstatus) {
       try {
-        await account.createEmailPasswordSession(email, password);
+        await account.createEmailPasswordSession({
+          email,
+          password,
+        });
         Alert.alert("Login Successful", "Welcome!");
         setLoading(false);
         router.replace("/");
-      } catch (e) {
+      } catch {
         setLoading(false);
-        console.error("error: " + e);
-        Alert.alert("error: " + e);
+        Alert.alert(
+          "Login Error",
+          "Invalid email or password. Please try again."
+        );
       }
     } else {
       setLoading(false);
-      console.error("already logged in");
       router.replace("/");
     }
   }
@@ -45,23 +49,32 @@ const LoginScreen = () => {
   };
 
   const handleGoogleLogin = async () => {
-    try {
-      const deepLink = new URL(makeRedirectUri({ preferLocalhost: true }));
-      const scheme = `${deepLink.protocol}//`;
+    if (loading) return; // Prevent multiple clicks
 
-      const loginUrl = await account.createOAuth2Token(
-        OAuthProvider.Google,
-        `${deepLink}`,
-        `${deepLink}`
-      );
+    try {
+      setLoading(true);
+
+      // Add a small delay to prevent rapid successive calls
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const redirectUri = makeRedirectUri({
+        scheme: getAppScheme(),
+        path: 'auth'
+      });
+
+      const loginUrl = await account.createOAuth2Token({
+        provider: OAuthProvider.Google,
+        success: redirectUri,
+        failure: redirectUri,
+      });
 
       const result = await WebBrowser.openAuthSessionAsync(
         `${loginUrl}`,
-        scheme
+        redirectUri
       );
 
       if (result.type !== "success" || !result.url) {
         Alert.alert("Error", "Google login cancelled or failed.");
+        setLoading(false);
         return;
       }
 
@@ -71,10 +84,14 @@ const LoginScreen = () => {
 
       if (!secret || !userId) {
         Alert.alert("Error", "Failed to retrieve Google login credentials.");
+        setLoading(false);
         return;
       }
 
-      await account.createSession(userId, secret);
+      await account.createSession({
+        userId,
+        secret,
+      });
       Alert.alert("Success", "Google login successful!");
 
       try {
@@ -95,13 +112,32 @@ const LoginScreen = () => {
           phone,
           verified,
         });
-      } catch (dbErr) {
-        console.error("Failed to ensure Google user in DB:", dbErr);
+      } catch {
+        // Silently handle database errors to avoid interrupting user flow
+        console.warn("Database operation failed, but login succeeded");
       }
       router.replace("/");
     } catch (e) {
-      console.error("Google Signup Error:", e);
-      Alert.alert("Google Signup Error", String(e));
+      const errorMessage = String(e);
+
+      // Handle specific update-related errors
+      if (
+        errorMessage.includes("Failed to download remote update") ||
+        errorMessage.includes("java.io.IOException")
+      ) {
+        Alert.alert(
+          "Connection Error",
+          "Please check your internet connection and try again. If the problem persists, try restarting the app."
+        );
+      } else if (errorMessage.includes("Rate limit") || errorMessage.includes("rate limit")) {
+        Alert.alert(
+          "Too Many Requests",
+          "Please wait a moment before trying again."
+        );
+      } else {
+        Alert.alert("Google Login Error", errorMessage);
+      }
+      setLoading(false);
     }
   };
   return (

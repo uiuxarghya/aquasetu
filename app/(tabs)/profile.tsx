@@ -1,7 +1,7 @@
-import client from "@/appWriteConfig";
-import React, { useEffect, useState } from "react";
+import client from "@/lib/appwrite.config";
+import { logout } from "@/lib/utils/auth";
 import { useRouter } from "expo-router";
-import { logout } from "@/utils/authUtils";
+import React, { useEffect, useState } from "react";
 
 import {
   ActivityIndicator,
@@ -20,9 +20,9 @@ const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID ?? "";
 const USERS_COLLECTION_ID =
   process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID ?? "users";
 
-const router = useRouter();
-
 export default function ProfileScreen() {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
