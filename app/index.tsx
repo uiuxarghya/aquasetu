@@ -1,5 +1,5 @@
-import client from "@/appWriteConfig";
-import { getLoginStatus, logout } from "@/utils/authUtils";
+import client from "@/lib/appwrite.config";
+import { getLoginStatus, logout } from "@/lib/utils/auth";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Button, Text, View } from "react-native";
@@ -7,11 +7,12 @@ import { Account } from "react-native-appwrite";
 let account = new Account(client);
 
 // init router
-const router = useRouter();
 
 export default function Index() {
+  const router = useRouter();
+
   const [loginStatus, setLoginStatus] = useState(false);
-  
+
   //check if logged in >.<
   useEffect(() => {
     const loginstatusfun = async () => {
