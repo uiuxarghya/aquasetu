@@ -1,11 +1,17 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Text } from "@/components/ui/text";
 import client from "@/lib/appwrite.config";
 import { getAppScheme, useAuth } from "@/lib/utils/auth";
 import { makeRedirectUri } from "expo-auth-session";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import React, { useState } from "react";
-import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, View } from "react-native";
 import { Account, OAuthProvider } from "react-native-appwrite";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -124,44 +130,115 @@ const LoginScreen = () => {
   };
 
   return (
-    <View className="flex-1 justify-center items-center bg-white px-4">
-      <Text className="text-3xl font-bold mb-8">Login</Text>
-      <TextInput
-        className="w-full max-w-[350px] h-12 border border-gray-300 rounded-lg px-3 mb-4 text-base"
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        placeholderTextColor="#888"
-      />
-      <TextInput
-        className="w-full max-w-[350px] h-12 border border-gray-300 rounded-lg px-3 mb-4 text-base"
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholderTextColor="#888"
-      />
-      <TouchableOpacity
-        className="w-full max-w-[350px] h-12 bg-blue-600 rounded-lg justify-center items-center mt-2"
-        onPress={handleLogin}
-        disabled={loading}
-      >
-        <Text className="text-white text-lg font-bold">
-          {loading ? "Logging in..." : "Login"}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        className="w-full max-w-[350px] h-12 bg-red-600 rounded-lg justify-center items-center mt-4"
-        onPress={() => handleGoogleLogin()}
-        disabled={loading}
-      >
-        <Text className="text-white text-lg font-bold">
-          Continue with Google
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <SafeAreaView className="flex-1">
+      <View className="flex-1 justify-center px-6">
+        {/* Header with Logo */}
+        <View className="items-center mb-6">
+          <View className="rounded-3xl shadow-2xl mb-6">
+            <Image
+              source={require("../../assets/images/icon.png")}
+              className="w-20 h-20"
+              resizeMode="contain"
+            />
+          </View>
+          <Text className="text-4xl font-bold font-space-mono text-blue-800 mb-3">
+            AquaSetu
+          </Text>
+          <Text className="text-center text-gray-600 text-base max-w-sm leading-6">
+            Welcome back! Please sign in to continue monitoring groundwater
+            quality
+          </Text>
+        </View>
+
+        {/* Login Form */}
+        <Card className="mx-2 border-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-center text-2xl font-bold">
+              Sign In
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 px-0 pb-8">
+            <View className="space-y-3">
+              <Label nativeID="email" className="font-semibold text-base">
+                Email Address
+              </Label>
+              <Input
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                aria-labelledby="email"
+                className="h-14 border-2 rounded-2xl px-4 text-base"
+              />
+            </View>
+
+            <View className="space-y-3">
+              <Label nativeID="password" className="font-semibold text-base">
+                Password
+              </Label>
+              <Input
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                aria-labelledby="password"
+                className="h-14 border-2 rounded-2xl px-4 text-base"
+              />
+            </View>
+
+            <Button
+              onPress={handleLogin}
+              disabled={loading}
+              className="w-full h-12 bg-blue-600 rounded-xl mt-3 shadow-lg shadow-blue-300/50"
+            >
+              <Text className="text-white font-bold text-lg">
+                {loading ? "Signing in..." : "Sign In"}
+              </Text>
+            </Button>
+
+            <View className="flex-row items-center my-2">
+              <View className="flex-1 h-px" />
+              <Text className="px-4 text-sm font-medium rounded-full py-1">
+                or continue with
+              </Text>
+              <View className="flex-1 h-px" />
+            </View>
+
+            <Button
+              variant="outline"
+              onPress={() => handleGoogleLogin()}
+              disabled={loading}
+              className="w-full h-14 border-2 rounded-2xl shadow-md"
+            >
+              <Image
+                source={{
+                  uri: "https://img.icons8.com/?size=100&id=17949&format=png&color=000000",
+                }}
+                className="w-6 h-6 mr-1"
+                resizeMode="contain"
+              />
+              <Text className="font-semibold text-lg">
+                Continue with Google
+              </Text>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <View className="items-center mt-4">
+          <Text className="text-gray-600 text-base">
+            Don&apos;t have an account?{" "}
+            <Text
+              className="text-blue-600 font-bold text-lg"
+              onPress={() => router.navigate("/(auth)/register")}
+            >
+              Sign Up
+            </Text>
+          </Text>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

@@ -3,8 +3,9 @@ import { useAuth } from "@/lib/utils/auth";
 import { ensureUserInDB } from "@/lib/utils/db";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, Alert, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { Account } from "react-native-appwrite";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -78,9 +79,33 @@ export default function AuthCallback() {
   }, [params, router, refreshAuth]);
 
   return (
-    <View className="flex-1 justify-center items-center bg-white">
-      <ActivityIndicator size="large" color="#0000ff" />
-      <Text className="mt-4 text-lg">Processing authentication...</Text>
-    </View>
+    <SafeAreaView className="flex-1">
+      <View className="flex-1 justify-center px-6">
+        {/* Header with Logo */}
+        <View className="items-center mb-6">
+          <View className="rounded-3xl shadow-2xl mb-6">
+            <Image
+              source={require("../../assets/images/icon.png")}
+              className="w-20 h-20"
+              resizeMode="contain"
+            />
+          </View>
+          <Text className="text-4xl font-bold font-space-mono text-blue-800 mb-3">
+            AquaSetu
+          </Text>
+          <Text className="text-center text-gray-600 text-base max-w-sm leading-6">
+            Processing your authentication...
+          </Text>
+        </View>
+
+        {/* Loading Indicator */}
+        <View className="items-center">
+          <ActivityIndicator size="large" color="#2563eb" />
+          <Text className="mt-4 text-lg text-gray-700">
+            Processing authentication...
+          </Text>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }

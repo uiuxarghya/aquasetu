@@ -1,4 +1,4 @@
-import { NAV_THEME } from "@/lib/theme";
+import { NAV_THEME, THEME } from "@/lib/theme";
 //@ts-ignore
 import { ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
@@ -6,6 +6,11 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
+import { View } from "react-native";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import "./globals.css";
 
 export {
@@ -14,7 +19,9 @@ export {
 } from "expo-router";
 
 export default function RootLayout() {
-  const { colorScheme = "light" } = useColorScheme();
+  const { colorScheme } = useColorScheme();
+  const insets = useSafeAreaInsets();
+
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -25,10 +32,45 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={NAV_THEME[colorScheme ?? "light"]}>
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-      <Stack screenOptions={{ headerShown: false }} />
-      <PortalHost />
-    </ThemeProvider>
+    <SafeAreaProvider
+      style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}
+    >
+      <ThemeProvider value={NAV_THEME[colorScheme ?? "light"]}>
+        {/* Status bar background view */}
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: insets.top,
+            backgroundColor:
+              colorScheme === "dark"
+                ? THEME.dark.background
+                : THEME.light.background,
+            zIndex: -1,
+          }}
+        />
+        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+        <Stack screenOptions={{ headerShown: false }} />
+        <PortalHost />
+
+        {/* Bottom safe area background view */}
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: insets.bottom,
+            backgroundColor:
+              colorScheme === "dark"
+                ? THEME.dark.background
+                : THEME.light.background,
+            zIndex: -1,
+          }}
+        />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
