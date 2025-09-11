@@ -1,5 +1,4 @@
-import client from "@/lib/appwrite.config";
-import { logout } from "@/lib/utils/auth";
+import { useAuth } from "@/lib/utils/auth";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 
@@ -7,27 +6,24 @@ import {
   ActivityIndicator,
   Alert,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { Account, Databases, Query } from "react-native-appwrite";
+import { Databases, Query } from "react-native-appwrite";
+import client from "@/lib/appwrite.config";
 
-const account = new Account(client);
 const databases = new Databases(client);
-
 const DATABASE_ID = process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID ?? "";
 const USERS_COLLECTION_ID =
   process.env.EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID ?? "users";
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { user, logout } = useAuth();
 
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [userId, setUserId] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
@@ -37,26 +33,28 @@ export default function ProfileScreen() {
   useEffect(() => {
     let mounted = true;
     async function load() {
+      if (!user) return;
+
       try {
         setLoading(true);
-        const acc = await account.get();
-        if (!mounted) return;
-        setUserId(acc.$id || "");
-        setEmail((acc.email as string) ?? "");
 
-        const acctName = (acc.name as string) ?? "";
-        const parts = acctName.split(" ").filter(Boolean);
+        // Use user data from useAuth hook
+        setEmail(user.email);
+
+        // Parse name from useAuth hook
+        const parts = user.name.split(" ").filter(Boolean);
         setFirstName(parts[0] ?? "");
         setLastName(parts.length > 1 ? parts.slice(1).join(" ") : "");
 
+        // Load additional profile data from database
         if (DATABASE_ID) {
           try {
-            const list = await databases.listDocuments(DATABASE_ID, "users", [
-              Query.equal("UserId", acc.$id as string),
+            const list = await databases.listDocuments(DATABASE_ID, USERS_COLLECTION_ID, [
+              Query.equal("UserId", user.id),
             ] as any);
 
             const doc = (list.documents || [])[0];
-            if (doc) {
+            if (doc && mounted) {
               setFirstName(doc.first_name ?? firstName);
               setLastName(doc.last_name ?? lastName);
               setPhone(doc.phone ?? "");
@@ -66,11 +64,12 @@ export default function ProfileScreen() {
             console.warn("Failed to load profile document:", dberr);
           }
         }
+
         setError(null);
       } catch (e) {
-        setError(String(e));
+        if (mounted) setError(String(e));
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
@@ -78,34 +77,11 @@ export default function ProfileScreen() {
     return () => {
       mounted = false;
     };
-  }, []);
-
-  const handleSave = async () => {
-    if (!userId) return Alert.alert("Not authenticated", "Please login first.");
-    setSaving(true);
-    try {
-      if (DATABASE_ID) {
-        await databases.updateDocument(
-          DATABASE_ID,
-          USERS_COLLECTION_ID,
-          userId,
-          { first_name: firstName, last_name: lastName, phone }
-        );
-        Alert.alert("Saved", "Profile updated.");
-      } else {
-        Alert.alert("Missing DB", "Database ID is not configured.");
-      }
-    } catch (e) {
-      console.error("Failed to save profile:", e);
-      Alert.alert("Save failed", String(e));
-    } finally {
-      setSaving(false);
-    }
-  };
+  }, [user, firstName, lastName]);
 
   const handleLogout = async () => {
     try {
-      await logout(account);
+      await logout();
       Alert.alert("Logged out", "You have been logged out.");
       router.replace("/");
     } catch (e) {
@@ -152,14 +128,17 @@ export default function ProfileScreen() {
         </View>
 
         <Text className="text-sm text-gray-600 mt-4">Phone</Text>
-        <TextInput
-          value={phone}
-          onChangeText={setPhone}
-          className="border rounded-lg px-3 py-2 mt-2"
-          keyboardType="phone-pad"
-        />
+        <Text className="border rounded-lg px-3 py-2 mt-2 bg-gray-50">
+          {phone || "Not provided"}
+        </Text>
 
-        <Text className="mt-3 text-sm">Verified: {verified ? "✅" : "❌"}</Text>
+        <Text className="text-sm text-gray-600 mt-4">Account Status</Text>
+        <View className="flex-row items-center mt-2">
+          <Text className="text-sm mr-2">Email Verified:</Text>
+          <Text className={`text-sm font-medium ${verified ? 'text-green-600' : 'text-red-600'}`}>
+            {verified ? "✅ Verified" : "❌ Not Verified"}
+          </Text>
+        </View>
 
         <View className="flex-row space-x-3 mt-6">
           <TouchableOpacity
