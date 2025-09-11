@@ -1,18 +1,17 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Text } from "@/components/ui/text";
 import client from "@/lib/appwrite.config";
 import { getAppScheme, useAuth } from "@/lib/utils/auth";
 import { makeRedirectUri } from "expo-auth-session";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import React, { useState } from "react";
-import {
-  Alert,
-  Button,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, Image, ScrollView, View } from "react-native";
 import { Account, OAuthProvider } from "react-native-appwrite";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const RegisterScreen = () => {
   const [firstName, setFirstName] = useState("");
@@ -140,68 +139,163 @@ const RegisterScreen = () => {
   };
 
   return (
-    <View className="flex-1 justify-center items-center bg-white px-4">
-      <Text className="text-3xl font-bold mb-8">Register</Text>
-      <View className="w-full max-w-[350px] flex-row space-x-5  mb-4">
-        <TextInput
-          className="flex-1 h-12 border border-gray-300 rounded-lg mr-3 px-3 text-base"
-          placeholder="First Name"
-          value={firstName}
-          onChangeText={setFirstName}
-          autoCapitalize="words"
-          placeholderTextColor="#888"
-        />
-        <TextInput
-          className="flex-1 h-12 border border-gray-300 rounded-lg px-3 text-base"
-          placeholder="Last Name"
-          value={lastName}
-          onChangeText={setLastName}
-          autoCapitalize="words"
-          placeholderTextColor="#888"
-        />
-      </View>
-      <TextInput
-        className="w-full max-w-[350px] h-12 border border-gray-300 rounded-lg px-3 mb-4 text-base"
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        placeholderTextColor="#888"
-      />
-      <TextInput
-        className="w-full max-w-[350px] h-12 border border-gray-300 rounded-lg px-3 mb-4 text-base"
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholderTextColor="#888"
-      />
-      <TextInput
-        className="w-full max-w-[350px] h-12 border border-gray-300 rounded-lg px-3 mb-4 text-base"
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-        placeholderTextColor="#888"
-      />
-      <TouchableOpacity
-        className="w-full max-w-[350px] h-12 bg-blue-600 rounded-lg justify-center items-center mt-2"
-        onPress={handleRegister}
-        disabled={loading}
+    <SafeAreaView className="flex-1">
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="justify-center px-6"
       >
-        <Text className="text-white text-lg font-bold">
-          {loading ? "Registering..." : "Register"}
-        </Text>
-      </TouchableOpacity>
-      <View className="mb-5 mt-5">
-        <Button
-          title="Continue with Google"
-          color="#ea4335"
-          onPress={() => handleGoogleSignup()}
-        />
-      </View>
-    </View>
+        {/* Header with Logo */}
+        <View className="items-center mb-6">
+          <View className="rounded-3xl shadow-2xl mb-6">
+            <Image
+              source={require("../../assets/images/icon.png")}
+              className="w-20 h-20"
+              resizeMode="contain"
+            />
+          </View>
+          <Text className="text-4xl font-bold font-space-mono text-blue-500 mb-3">
+            AquaSetu
+          </Text>
+          <Text className="text-center text-gray-600 text-base max-w-sm leading-6">
+            Join us in monitoring groundwater quality and making a difference
+          </Text>
+        </View>
+
+        {/* Register Form */}
+        <Card className="mx-2 border-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-center text-2xl font-bold">
+              Create Account
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 px-0 pb-8">
+            <View className="flex flex-row gap-x-4">
+              <View className="flex-1 space-y-3">
+                <Label nativeID="firstName" className="font-semibold text-base">
+                  First Name
+                </Label>
+                <Input
+                  placeholder="First name"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  autoCapitalize="words"
+                  aria-labelledby="firstName"
+                  className="h-14 border-2 rounded-2xl px-4 text-base"
+                />
+              </View>
+              <View className="flex-1 space-y-3">
+                <Label nativeID="lastName" className="font-semibold text-base">
+                  Last Name
+                </Label>
+                <Input
+                  placeholder="Last name"
+                  value={lastName}
+                  onChangeText={setLastName}
+                  autoCapitalize="words"
+                  aria-labelledby="lastName"
+                  className="h-14 border-2 rounded-2xl px-4 text-base"
+                />
+              </View>
+            </View>
+
+            <View className="space-y-3">
+              <Label nativeID="email" className="font-semibold text-base">
+                Email Address
+              </Label>
+              <Input
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                aria-labelledby="email"
+                className="h-14 border-2 rounded-2xl px-4 text-base"
+              />
+            </View>
+
+            <View className="space-y-3">
+              <Label nativeID="password" className="font-semibold text-base">
+                Password
+              </Label>
+              <Input
+                placeholder="Create a password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                aria-labelledby="password"
+                className="h-14 border-2 rounded-2xl px-4 text-base"
+              />
+            </View>
+
+            <View className="space-y-3">
+              <Label
+                nativeID="confirmPassword"
+                className="font-semibold text-base"
+              >
+                Confirm Password
+              </Label>
+              <Input
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+                aria-labelledby="confirmPassword"
+                className="h-14 border-2 rounded-2xl px-4 text-base"
+              />
+            </View>
+
+            <Button
+              onPress={handleRegister}
+              disabled={loading}
+              className="w-full h-12 bg-blue-600 rounded-xl mt-3 shadow-lg shadow-blue-300/50"
+            >
+              <Text className="text-white font-bold text-lg">
+                {loading ? "Creating Account..." : "Create Account"}
+              </Text>
+            </Button>
+
+            <View className="flex-row items-center my-2">
+              <View className="flex-1 h-px" />
+              <Text className="px-4 text-sm font-medium rounded-full py-1">
+                or continue with
+              </Text>
+              <View className="flex-1 h-px" />
+            </View>
+
+            <Button
+              variant="outline"
+              onPress={() => handleGoogleSignup()}
+              disabled={loading}
+              className="w-full h-14 border-2 rounded-2xl shadow-md"
+            >
+              <Image
+                source={{
+                  uri: "https://img.icons8.com/?size=100&id=17949&format=png&color=000000",
+                }}
+                className="w-6 h-6 mr-1"
+                resizeMode="contain"
+              />
+              <Text className="font-semibold text-lg">
+                Continue with Google
+              </Text>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <View className="items-center mt-4">
+          <Text className="text-gray-600 text-base">
+            Already have an account?{" "}
+            <Text
+              className="text-blue-600 font-bold text-lg"
+              onPress={() => router.push("/(auth)/login")}
+            >
+              Sign In
+            </Text>
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
