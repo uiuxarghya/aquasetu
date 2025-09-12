@@ -837,7 +837,7 @@ export default function StationDetailsScreen() {
                         <LineChart
                           data={adaptiveChartData}
                           width={Math.max(320, chartData.length * 25)}
-                          height={180}
+                          height={200}
                           spacing={15}
                           thickness={2}
                           color="#3b82f6"
@@ -858,8 +858,6 @@ export default function StationDetailsScreen() {
                             fontSize: 11,
                             fontWeight: "600",
                           }}
-                          textShiftY={4}
-                          textShiftX={4}
                           textFontSize={12}
                           hideDataPoints={false}
                           dataPointsColor="#3b82f6"
@@ -870,59 +868,57 @@ export default function StationDetailsScreen() {
                           xAxisIndicesHeight={3}
                           yAxisIndicesWidth={3}
                           adjustToWidth={false}
-                          noOfSections={optimalSections}
                           maxValue={adaptiveMax}
-                          stepValue={adaptiveStep}
+                          stepValue={adaptiveStep - 1}
+                          yAxisOffset={adaptiveMax + 5}
                         />
                       </ScrollView>
                     ) : (
                       <LineChart
-                        data={adaptiveChartData}
-                        width={
-                          Math.min(Dimensions.get("window").width - 40, 320) -
-                          20
-                        }
-                        height={180}
-                        spacing={Math.max(
-                          8,
-                          (Math.min(Dimensions.get("window").width - 40, 320) -
-                            40) /
+                          data={adaptiveChartData}
+                          width={
+                            Math.min(Dimensions.get("window").width - 40, 320) -
+                            20
+                          }
+                          height={200}
+                          spacing={Math.max(
+                            8,
+                            (Math.min(Dimensions.get("window").width - 40, 320) -
+                              40) /
                             Math.max(chartData.length, 1)
-                        )}
-                        thickness={2}
-                        color="#3b82f6"
-                        startFillColor="#3b82f6"
-                        endFillColor="#3b82f6"
-                        startOpacity={0.3}
-                        endOpacity={0.1}
-                        initialSpacing={8}
-                        endSpacing={8}
-                        yAxisColor="#9ca3af"
-                        xAxisColor="#9ca3af"
-                        yAxisThickness={1}
-                        xAxisThickness={1}
-                        rulesColor="#e5e7eb"
-                        rulesType="solid"
-                        yAxisTextStyle={{
-                          color: "#374151",
-                          fontSize: 11,
-                          fontWeight: "600",
-                        }}
-                        textShiftY={4}
-                        textShiftX={4}
-                        textFontSize={12}
-                        hideDataPoints={chartData.length > 12}
-                        dataPointsColor="#3b82f6"
-                        dataPointsRadius={2}
-                        showVerticalLines={false}
-                        showYAxisIndices={true}
-                        showXAxisIndices={true}
-                        xAxisIndicesHeight={3}
-                        yAxisIndicesWidth={3}
-                        adjustToWidth={false}
-                        noOfSections={optimalSections}
-                        maxValue={adaptiveMax}
-                        stepValue={adaptiveStep}
+                          )}
+                          thickness={2}
+                          color="#3b82f6"
+                          startFillColor="#3b82f6"
+                          endFillColor="#3b82f6"
+                          startOpacity={0.3}
+                          endOpacity={0.1}
+                          initialSpacing={8}
+                          endSpacing={8}
+                          yAxisColor="#9ca3af"
+                          xAxisColor="#9ca3af"
+                          yAxisThickness={1}
+                          xAxisThickness={1}
+                          rulesColor="#e5e7eb"
+                          rulesType="solid"
+                          yAxisTextStyle={{
+                            color: "#374151",
+                            fontSize: 11,
+                            fontWeight: "600",
+                          }}
+                          textFontSize={12}
+                          hideDataPoints={chartData.length > 12}
+                          dataPointsColor="#3b82f6"
+                          dataPointsRadius={2}
+                          showVerticalLines={false}
+                          showYAxisIndices={true}
+                          showXAxisIndices={true}
+                          xAxisIndicesHeight={3}
+                          yAxisIndicesWidth={3}
+                          adjustToWidth={false}
+                          maxValue={adaptiveMax}
+                          stepValue={adaptiveStep - 1}
+                          yAxisOffset={adaptiveMax + 5}
                       />
                     );
                   })()}
