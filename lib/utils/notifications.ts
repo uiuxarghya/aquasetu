@@ -105,7 +105,10 @@ class NotificationService {
     }
   }
 
-  private formatNotificationContent(alertData: AlertNotificationData): { title: string; body: string } {
+  private formatNotificationContent(alertData: AlertNotificationData): {
+    title: string;
+    body: string;
+  } {
     const stationInfo = `DWLR ${alertData.station}`;
 
     switch (alertData.type) {
