@@ -1,3 +1,5 @@
+import { NotificationHandler } from "@/components/notification-handler";
+import { AlertsProvider } from "@/lib/alerts-context";
 import { NAV_THEME, THEME } from "@/lib/theme";
 //@ts-ignore
 import { ThemeProvider } from "@react-navigation/native";
@@ -52,7 +54,10 @@ export default function RootLayout() {
           }}
         />
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        <Slot />
+        <AlertsProvider>
+          <NotificationHandler />
+          <Slot />
+        </AlertsProvider>
         <PortalHost />
 
         {/* Bottom safe area background view */}
