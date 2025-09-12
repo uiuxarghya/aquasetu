@@ -22,10 +22,33 @@ export async function getBookmarks(account: Account) {
   }
 }
 
+export async function isBookmarked(account: Account, station_code: string) {
+  const userID = (await account.get()).$id;
+
+  const safeUserID = String(userID).replace(/[^a-zA-Z0-9._-]/g, '').slice(0, 16);
+  const safeStationCode = String(station_code).replace(/[^a-zA-Z0-9._-]/g, '').slice(0, 16);
+  const docId = `${safeUserID}_${safeStationCode}`;
+
+  console.log(docId);
+
+  try {
+    const doc = await databases.getDocument(
+      DATABASE_ID,
+      "bookmarks",
+      docId
+    );
+    return true;
+  } catch (err) {
+    // console.error("Failed to fetch bookmark:", err);
+    return false;
+  }
+}
+
 export async function addBookmark(account: Account, stationcode: string) {
   const userID = (await account.get()).$id;
   try {
     // Fetch station data from API
+    console.log(stationcode)
     const response = await fetch(
       "https://indiawris.gov.in/stationMaster/getMasterStationsList",
       {
