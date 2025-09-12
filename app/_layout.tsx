@@ -3,7 +3,7 @@ import { NAV_THEME, THEME } from "@/lib/theme";
 import { ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
 import { View } from "react-native";
@@ -52,7 +52,7 @@ export default function RootLayout() {
           }}
         />
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        <Stack screenOptions={{ headerShown: false }} />
+        <Slot />
         <PortalHost />
 
         {/* Bottom safe area background view */}
