@@ -41,50 +41,6 @@ interface StationData {
   unit: string;
 }
 
-const mockData = {
-  date_of_establishment: null,
-  classified: "No",
-  flood_forecast: "No",
-  warning_level: null,
-  danger_level: null,
-  highest_flow_level_date: null,
-  highest_flow_level: null,
-  water_level_data_available_from: null,
-  discharge_data_available: "No",
-  reduced_level_of_zero_gauge: null,
-  mslmeter: 5.2,
-  unit: "m",
-  block: null,
-  village: null,
-  well_type: null,
-  well_depth: 251.4,
-  well_aquifer_type: "Confined",
-  tributary_id: null,
-  independent_river: null,
-  sub_Tributary: null,
-  data_Acquisition_Mode: "Telemetric",
-  station_Status: "Active",
-  station_Type: "Ground Water",
-  data_available_from: "2023-01-03",
-  data_available_Till: "2025-09-13",
-  state_Code: "25",
-  district_Id: 119018,
-  basin_Code: null,
-  major_Basin: null,
-  agency_Name: "CGWB",
-  station_Code: "CGWB1WBKOL022",
-  station_Name: "Salt Lake Pz_1",
-  saved_By_Userid: 848,
-  save_date: "2023-05-02T00:00:00",
-  state: "West Bengal",
-  agencyId: 113,
-  latitude: 22.576,
-  longitude: 88.4385,
-  district: "KOLKATA",
-  tributary: null,
-  tehsil: "-",
-};
-
 const oneDayData = [
   {
     label: "00:00:00",
@@ -110,8 +66,8 @@ const oneDayData = [
 
 export default function StationDetailsScreen() {
   const { id } = useLocalSearchParams();
-  const [data, setData] = useState<StationData | null>(mockData);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<StationData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isbooked, setIsBooked] = useState<Boolean>(false);
   const account = new Account(client);
@@ -153,7 +109,7 @@ export default function StationDetailsScreen() {
         setLoading(false);
       }
     };
-    // fetchData();
+    fetchData();
   }, [id]);
 
   if (loading) {
@@ -347,13 +303,21 @@ export default function StationDetailsScreen() {
         </View>
 
         {/* Space for Charts */}
-        <View className="h-[300px] w-[600px]">
-          <View className="flex-1 justify-center items-center">
+        <View className="h-[300px] w-[400px]">
+          <View className="flex-1 justify-center items-center p-5">
+            <Text className="m-2 pt-5">Last One Day</Text>
             <LineChart
-              spacing={60}
+              spacing={80}
               data={oneDayData}
-              width={600}
+              width={350}
               height={250}
+              color="#0BA5A4"
+              dataPointsColor={'red'}
+              xAxisColor="#00FF00"
+              yAxisColor="#00FF00"
+              xAxisLabelTextStyle={{ color: "green" }}
+              yAxisTextStyle={{ color: "green" }}
+              yAxisLabelContainerStyle={{padding: 5}}
             />
           </View>
         </View>
