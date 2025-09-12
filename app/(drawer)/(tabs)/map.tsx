@@ -643,7 +643,7 @@ export default function MapScreen() {
   `;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "transparent" }}>
+    <View className="flex-1 bg-background mb-14">
       <WebView
         source={{ html }}
         originWhitelist={["*"]}
