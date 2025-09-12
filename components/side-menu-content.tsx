@@ -89,7 +89,7 @@ export default function SideMenuContent(props: any) {
           try {
             await logout();
             Alert.alert("Logged out", "You have been logged out successfully.");
-            router.replace("/");
+            router.replace("/(auth)/auth");
           } catch (e) {
             console.error("Logout failed:", e);
             Alert.alert("Logout failed", String(e));
@@ -250,7 +250,7 @@ export default function SideMenuContent(props: any) {
             <Button
               variant="ghost"
               className="w-full justify-start px-4 py-3"
-              onPress={() => {
+              onPressIn={() => {
                 props.navigation?.closeDrawer();
                 handleLogout();
               }}
