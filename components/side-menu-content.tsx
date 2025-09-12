@@ -140,7 +140,7 @@ export default function SideMenuContent(props: any) {
   ];
 
   return (
-    <DrawerContentScrollView {...props} className="border border-red-500">
+    <DrawerContentScrollView {...props}>
       {/* Profile Section */}
       <View className="px-4 pb-4">
         {loading ? (

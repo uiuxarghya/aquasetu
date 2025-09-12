@@ -1,4 +1,5 @@
 import { Text } from "@/components/ui/text";
+import { useAlerts } from "@/lib/alerts-context";
 import { THEME } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,18 +11,20 @@ const TabIcon = ({
   iconName,
   title,
   focused,
+  badgeCount,
 }: {
   iconName: keyof typeof Ionicons.glyphMap;
   title: string;
   focused: boolean;
+  badgeCount?: number;
 }) => {
   const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? THEME.dark : THEME.light;
 
   return (
     <View className="flex-1 items-center justify-center p-1 min-w-[100px] h-full min-h-14">
-      <View className="flex-col items-center justify-center h-full px-2 py-2 rounded-xl">
-        <View className="items-center justify-center w-8 h-8">
+      <View className="flex-col items-center justify-center h-full px-2 py-2 rounded-xl relative">
+        <View className="items-center justify-center w-8 h-8 relative">
           <Ionicons
             name={
               focused
@@ -34,6 +37,13 @@ const TabIcon = ({
             size={20}
             color={focused ? theme.primary : theme.mutedForeground}
           />
+          {badgeCount && badgeCount > 0 && (
+            <View className="absolute -top-1 -right-1 bg-red-500 rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+              <Text className="text-white text-[10px] font-bold leading-none">
+                {badgeCount > 99 ? "99+" : badgeCount}
+              </Text>
+            </View>
+          )}
         </View>
 
         <Text
@@ -48,9 +58,11 @@ const TabIcon = ({
     </View>
   );
 };
+
 export default function TabsLayout() {
   const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? THEME.dark : THEME.light;
+  const { alertCount } = useAlerts();
 
   return (
     <Tabs
@@ -114,6 +126,19 @@ export default function TabsLayout() {
               iconName="bookmark-outline"
               title="Bookmarks"
               focused={focused}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="alerts"
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              iconName="notifications-outline"
+              title="Alerts"
+              focused={focused}
+              badgeCount={alertCount}
             />
           ),
         }}
