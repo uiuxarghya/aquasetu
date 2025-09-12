@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import client from "@/lib/appwrite.config";
-import { addBookmark } from "@/lib/utils/db";
+import { addBookmark, isBookmarked } from "@/lib/utils/db";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import {
@@ -44,8 +44,12 @@ export default function StationDetailsScreen() {
   const [data, setData] = useState<StationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isbooked , setIsBooked] = useState<Boolean>(false);
   const account = new Account(client);
 
+
+
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -62,6 +66,17 @@ export default function StationDetailsScreen() {
             }),
           }
         );
+
+        const bookstatus = async()=>{
+          const res = await isBookmarked(account , String(id));
+          console.log(res)
+          if(res)
+            setIsBooked(true);
+          else
+            setIsBooked(false)
+        }
+
+        await bookstatus();
         const json = await response.json();
         if (json.statusCode === 200 && json.data.length > 0) {
           setData(json.data[0]);
@@ -129,9 +144,10 @@ export default function StationDetailsScreen() {
               className="bg-background"
               onPressIn={() => {
                 addBookmark(account, String(id));
+                setIsBooked(true);
               }}
             >
-              <Ionicons name="bookmark-outline" size={18} color="#3b82f6" />
+              <Ionicons name={isbooked ? "bookmark": "bookmark-outline"} size={18} color="#3b82f6" />
             </Button>
           </View>
           <View className="flex-row items-center mt-1.5">

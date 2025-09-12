@@ -33,6 +33,8 @@ export default function BookmarksScreen() {
   );
 
   const handleDelete = async (station_code: string) => {
+    // Optimistically remove from UI
+    setBookmarks((prev) => prev.filter((b) => b.station_code !== station_code));
     await deleteBookmark(account, station_code);
     fetchBookmarks();
   };
@@ -54,7 +56,7 @@ export default function BookmarksScreen() {
         ) : (
           <FlatList
             data={bookmarks}
-            keyExtractor={(item) => item.$id}
+            keyExtractor={(item) => item.station_code}
             contentContainerStyle={{ paddingBottom: 32 }}
             ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
             renderItem={({ item }) => (
