@@ -203,11 +203,7 @@ export default function ProfileScreen() {
                   className="w-full"
                   onPress={sendTestNotification}
                 >
-                  <Ionicons
-                    name="water"
-                    size={16}
-                    color={theme.primary}
-                  />
+                  <Ionicons name="water" size={16} color={theme.primary} />
                   <Text className="ml-2 text-primary">
                     Test Groundwater Alerts
                   </Text>
