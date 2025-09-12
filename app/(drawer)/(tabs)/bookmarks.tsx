@@ -5,31 +5,31 @@ import { deleteBookmark, getBookmarks } from "@/lib/utils/db";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, View } from "react-native";
 import { Account } from "react-native-appwrite";
 
 export default function BookmarksScreen() {
-  const account: Account = new Account(client);
+  const account = useMemo(() => new Account(client), []);
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const fetchBookmarks = async () => {
+  const fetchBookmarks = useCallback(async () => {
     setLoading(true);
     const res = await getBookmarks(account);
     if (res.success) setBookmarks(res.bookmarks ?? []);
     setLoading(false);
-  };
+  }, [account]);
 
   useEffect(() => {
     fetchBookmarks();
-  }, []);
+  }, [fetchBookmarks]);
 
   useFocusEffect(
     React.useCallback(() => {
       fetchBookmarks();
-    }, [])
+    }, [fetchBookmarks])
   );
 
   const handleDelete = async (station_code: string) => {
