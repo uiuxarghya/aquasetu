@@ -139,7 +139,7 @@ const RegisterScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 bg-background">
       <ScrollView
         className="flex-1"
         contentContainerClassName="justify-center px-6"
@@ -149,14 +149,14 @@ const RegisterScreen = () => {
           <View className="rounded-3xl shadow-2xl mb-6">
             <Image
               source={require("../../assets/images/icon.png")}
-              className="w-20 h-20"
+              className="w-20 h-20 rounded-2xl"
               resizeMode="contain"
             />
           </View>
-          <Text className="text-4xl font-bold font-space-mono text-blue-500 mb-3">
+          <Text className="text-4xl font-bold font-space-mono text-foreground mb-3">
             AquaSetu
           </Text>
-          <Text className="text-center text-gray-600 text-base max-w-sm leading-6">
+          <Text className="text-center text-muted-foreground text-base max-w-sm leading-6">
             Join us in monitoring groundwater quality and making a difference
           </Text>
         </View>
@@ -247,16 +247,16 @@ const RegisterScreen = () => {
             <Button
               onPress={handleRegister}
               disabled={loading}
-              className="w-full h-12 bg-blue-600 rounded-xl mt-3 shadow-lg shadow-blue-300/50"
+              className="w-full h-12 rounded-xl mt-3 shadow-lg"
             >
-              <Text className="text-white font-bold text-lg">
+              <Text className="text-primary-foreground font-bold text-lg">
                 {loading ? "Creating Account..." : "Create Account"}
               </Text>
             </Button>
 
             <View className="flex-row items-center my-2">
               <View className="flex-1 h-px" />
-              <Text className="px-4 text-sm font-medium rounded-full py-1">
+              <Text className="px-4 text-sm font-medium rounded-full py-1 text-muted-foreground">
                 or continue with
               </Text>
               <View className="flex-1 h-px" />
@@ -284,10 +284,10 @@ const RegisterScreen = () => {
 
         {/* Footer */}
         <View className="items-center mt-4">
-          <Text className="text-gray-600 text-base">
+          <Text className="text-muted-foreground text-base">
             Already have an account?{" "}
             <Text
-              className="text-blue-600 font-bold text-lg"
+              className="text-primary font-bold text-lg"
               onPress={() => router.push("/(auth)/login")}
             >
               Sign In

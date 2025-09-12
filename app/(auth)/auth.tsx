@@ -79,29 +79,26 @@ export default function AuthCallback() {
   }, [params, router, refreshAuth]);
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 bg-background">
       <View className="flex-1 justify-center px-6">
         {/* Header with Logo */}
         <View className="items-center mb-6">
           <View className="rounded-3xl shadow-2xl mb-6">
             <Image
               source={require("../../assets/images/icon.png")}
-              className="w-20 h-20"
+              className="w-20 h-20 rounded-2xl"
               resizeMode="contain"
             />
           </View>
-          <Text className="text-4xl font-bold font-space-mono text-blue-800 mb-3">
+          <Text className="text-4xl font-bold font-space-mono text-foreground mb-3">
             AquaSetu
-          </Text>
-          <Text className="text-center text-gray-600 text-base max-w-sm leading-6">
-            Processing your authentication...
           </Text>
         </View>
 
         {/* Loading Indicator */}
         <View className="items-center">
-          <ActivityIndicator size="large" color="#2563eb" />
-          <Text className="mt-4 text-lg text-gray-700">
+          <ActivityIndicator size="large" color="#3b82f6" />
+          <Text className="mt-4 text-lg text-foreground">
             Processing authentication...
           </Text>
         </View>
