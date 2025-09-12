@@ -1,13 +1,44 @@
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { WebView } from "react-native-webview";
+import * as Location from "expo-location";
 
 const MAPBOX_ACCESS_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? "";
 const GEOJSON_URL = process.env.EXPO_PUBLIC_GEOJSON_URL ?? "";
 
 export default function MapScreen() {
   const router = useRouter();
+  const [latitude, setLatitude] = useState<number>(78);
+  const [longitude, setLongitude] = useState<number>(22);
+  const [accuracy, setAccuracy] = useState<number>(0);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest, // fine-grained accuracy
+      });
+
+      // console.log("Latitude:", location.coords.latitude);
+      // console.log("Longitude:", location.coords.longitude);
+      // console.log("Accuracy:", location.coords.accuracy, "meters");
+
+      setLatitude(location.coords.latitude);
+      setLongitude(location.coords.longitude);
+      if (
+        location.coords.accuracy !== null &&
+        location.coords.accuracy !== undefined
+      ) {
+        setAccuracy(location.coords.accuracy);
+      }
+    })();
+  }, []);
 
   const html = `
   <!DOCTYPE html>
@@ -362,7 +393,66 @@ export default function MapScreen() {
                         break;
                     }
 
-                    alert(errorMessage);
+                    //alert(errorMessage);
+
+                    const map_latitude = ${latitude}
+                    const map_longitude = ${longitude}
+                    const map_accuracy = ${accuracy}
+
+                    // Remove any existing user location markers
+                      document
+                        .querySelectorAll(".user-location-marker")
+                        .forEach((marker) => {
+                          marker.remove();
+                        });
+                    
+                        
+                    map.flyTo({
+                        center: [map_longitude, map_latitude],
+                        zoom: Math.max(
+                          12,
+                          Math.min(16, 18 - Math.log2(map_accuracy / 10))
+                        ),
+                        essential: true,
+                      });
+                    
+                    const userLocation = document.createElement("div");
+                      userLocation.className = "user-location-marker";
+                      userLocation.innerHTML = "📍";
+                      userLocation.title =
+                        "Accuracy: " + Math.round(map_accuracy) + "m";
+
+                    const marker = new mapboxgl.Marker(userLocation)
+                        .setLngLat([map_longitude, map_latitude])
+                        .addTo(map);
+                    
+                    // Add accuracy circle
+                    if (map_accuracy < 1000) {
+                      // Only show if accuracy is reasonable
+                      map.addSource("user-accuracy", {
+                        type: "geojson",
+                        data: {
+                          type: "Feature",
+                          geometry: {
+                            type: "Point",
+                            coordinates: [map_longitude, map_latitude],
+                          },
+                        },
+                      });
+
+                     map.addLayer({
+                          id: "user-accuracy-circle",
+                          type: "circle",
+                          source: "user-accuracy",
+                          paint: {
+                            "circle-radius": accuracy / 10, // Scale for visibility
+                            "circle-color": "rgba(0, 116, 217, 0.2)",
+                            "circle-stroke-color": "rgba(0, 116, 217, 0.5)",
+                            "circle-stroke-width": 1,
+                          },
+                        });
+                      }
+
                     button.innerHTML = '<span class="mapboxgl-ctrl-icon" aria-hidden="true" title="Find my location">📍</span>';
                     button.disabled = false;
                   },
