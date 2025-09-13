@@ -1,6 +1,6 @@
 # 🌊 AquaSetu
 
-A comprehensive mobile application for monitoring and visualizing groundwater quality across India. Built with React Native and Expo, featuring interactive maps, real-time data visualization, and user-friendly station exploration.
+A comprehensive mobile application for monitoring and visualizing groundwater levels across India. Built with React Native and Expo, featuring interactive maps, real-time data visualization, push notifications, and user-friendly station exploration with drawer navigation and advanced analytics.
 
 ## 🌟 Features
 
@@ -12,7 +12,9 @@ A comprehensive mobile application for monitoring and visualizing groundwater qu
 - **Station Details**: Detailed water quality parameters for each monitoring station
 - **User Authentication**: Secure login and registration system
 - **Bookmarks**: Save favorite stations for quick access
-- **User Profile**: Manage personal information and preferences
+- **Alerts**: Receive notifications about groundwater quality changes
+- **Analytics**: View data trends and insights
+- **Settings**: Manage personal information and preferences
 
 ### Technical Features
 
@@ -21,12 +23,15 @@ A comprehensive mobile application for monitoring and visualizing groundwater qu
 - **Responsive Design**: Optimized for various screen sizes and orientations
 - **Dark/Light Theme**: Automatic theme switching based on device settings
 - **Smooth Animations**: Fluid user experience with React Native Reanimated
+- **Push Notifications**: Real-time alerts for water quality changes
+- **Geolocation Services**: GPS-based station discovery and directions
+- **Haptic Feedback**: Enhanced user interaction with device vibrations
 
 ## 🛠️ Technologies Used
 
 ### Frontend
 
-- **React Native 0.79.6** - Cross-platform mobile development
+- **React Native 0.79.5** - Cross-platform mobile development
 - **Expo SDK 53** - Development platform and build tools
 - **Expo Router** - File-based routing for React Native
 - **NativeWind** - Tailwind CSS for React Native
@@ -37,20 +42,27 @@ A comprehensive mobile application for monitoring and visualizing groundwater qu
 - **Appwrite** - Backend-as-a-Service for authentication and database
 - **Mapbox GL JS** - Interactive mapping and visualization
 - **WebView** - Embedded web content for map rendering
+- **React Native Gifted Charts** - Data visualization and analytics charts
+- **Expo Notifications** - Push notifications and alerts
+- **Expo Location** - GPS and geolocation services
 
 ### Development Tools
 
-- **TypeScript** - Type-safe JavaScript
+- **TypeScript** - Type-safe JavaScript with strict mode
 - **ESLint** - Code linting and formatting
-- **Prettier** - Code formatting
+- **Prettier** - Code formatting with Tailwind CSS plugin
 - **Bun** - Fast JavaScript runtime (optional)
+- **Expo CLI** - Development and build tools
+- **NativeWind** - Tailwind CSS integration for React Native
 
 ### UI Components
 
 - **React Native Reusables** - Accessible components based on shadcn/ui
+- **React Native Primitives** - Low-level UI primitives for custom components
 - **Tailwind CSS** - Utility-first CSS framework
-- **Expo Vector Icons** - Icon library
+- **Expo Vector Icons** - Icon library with Ionicons
 - **React Native Safe Area Context** - Safe area handling
+- **NativeWind** - Tailwind CSS for React Native with dark mode support
 
 ## 📋 Prerequisites
 
@@ -143,27 +155,42 @@ aquasetu/
 │   │   ├── auth.tsx
 │   │   ├── login.tsx
 │   │   └── register.tsx
-│   └── (tabs)/                  # Main app tabs
-│       ├── _layout.tsx          # Tab navigation layout
-│       ├── index.tsx            # Home/dashboard screen
-│       ├── map.tsx              # Interactive map screen
-│       ├── search.tsx           # Search stations screen
-│       ├── bookmarks.tsx        # Bookmarked stations
-│       ├── profile.tsx          # User profile screen
-│       └── station/             # Station details
-│           └── [id].tsx         # Dynamic station detail page
+│   └── (drawer)/                # Drawer navigation
+│       ├── _layout.tsx          # Drawer layout
+│       └── (tabs)/              # Main app tabs
+│           ├── _layout.tsx      # Tab navigation layout
+│           ├── index.tsx        # Home/dashboard screen
+│           ├── map.tsx          # Interactive map screen
+│           ├── search.tsx       # Search stations screen
+│           ├── bookmarks.tsx    # Bookmarked stations
+│           ├── alerts.tsx       # Alerts screen
+│           ├── analytics.tsx    # Analytics screen
+│           ├── settings.tsx     # Settings screen
+│           └── station/         # Station details
+│               └── [id].tsx     # Dynamic station detail page
 ├── components/                  # Reusable UI components
+│   ├── notification-handler.tsx # Notification handling component
+│   ├── side-menu-content.tsx    # Side menu content
 │   └── ui/                      # UI component library
 ├── lib/                         # Core utilities and configurations
+│   ├── alerts-context.tsx       # Alerts context for state management
 │   ├── appwrite.config.ts       # Appwrite client configuration
 │   ├── theme.ts                 # Theme configuration
 │   ├── utils.ts                 # General utilities
 │   └── utils/                   # Specialized utilities
 │       ├── auth.ts              # Authentication helpers
-│       └── db.ts                # Database operations
+│       ├── db.ts                # Database operations
+│       ├── groundwater-data.ts  # Groundwater data utilities
+│       ├── notifications.ts     # Notification utilities
+│       └── search.ts            # Search utilities
 ├── assets/                      # Static assets
 │   ├── fonts/                   # Custom fonts
+│   │   └── SpaceMono-Regular.ttf
 │   └── images/                  # App images and icons
+│       ├── adaptive-icon.png
+│       ├── favicon.png
+│       ├── icon.png
+│       └── splash-icon.png
 └── constants/                   # App constants and configurations
 ```
 
@@ -184,11 +211,18 @@ aquasetu/
 
 ### File-based Routing
 
-The project uses [Expo Router](https://docs.expo.dev/router/introduction/) for navigation:
+The project uses [Expo Router](https://docs.expo.dev/router/introduction/) for navigation with [React Navigation](https://reactnavigation.org/):
 
 - `(auth)` - Authentication group
-- `(tabs)` - Main tab navigation
+- `(drawer)/(tabs)` - Drawer navigation with embedded tab navigation
 - `station/[id]` - Dynamic station detail routes
+
+**Navigation Features:**
+
+- **Drawer Menu**: Side navigation accessible via swipe or menu button
+- **Bottom Tabs**: Main navigation with Home, Map, Search, Bookmarks, and Alerts
+- **Hidden Tabs**: Analytics and Settings accessed via drawer menu or other navigation
+- **Badge Notifications**: Alert count displayed on the Alerts tab icon
 
 ## 🔒 Authentication & Database
 
@@ -236,15 +270,23 @@ The project uses [Expo Router](https://docs.expo.dev/router/introduction/) for n
 - **Map**: Interactive groundwater station map
 - **Search**: Advanced station search with filters
 - **Bookmarks**: Saved stations for quick access
-- **Profile**: User settings and information
+- **Alerts**: Notifications and alerts for water quality
+- **Analytics**: Data visualization and trends
+- **Settings**: User settings and information
 - **Station Details**: Comprehensive water quality data
 
 ## 📱 Platform Support
 
-- **iOS**: Full support with native performance
-- **Android**: Complete feature parity
+- **iOS**: Full support with native performance, tablet compatibility
+- **Android**: Complete feature parity, edge-to-edge display, adaptive icons
 - **Web**: Responsive web version available
 - **Expo Go**: Quick testing and development
+
+**Platform Features:**
+
+- **iOS**: Tablet support, foreground notifications
+- **Android**: Edge-to-edge UI, vibration feedback, wake lock
+- **Cross-platform**: Consistent experience across all platforms
 
 ## 🔧 Scripts
 
