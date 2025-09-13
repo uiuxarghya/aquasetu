@@ -144,6 +144,12 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="analytics"
+        options={{
+          tabBarItemStyle: { display: "none" }, // Hide the station tab
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           tabBarItemStyle: { display: "none" }, // Hide the station tab
