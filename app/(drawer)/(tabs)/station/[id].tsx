@@ -52,6 +52,7 @@ export default function StationDetailsScreen() {
   const [isbooked, setIsBooked] = useState<boolean>(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState<string>("1D");
   const [chartData, setChartData] = useState<any[]>([]);
+  const [noDataMessage, setNoDataMessage] = useState<string | null>(null);
   const account = useMemo(() => new Account(client), []);
 
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function StationDetailsScreen() {
         const json = await response.json();
         if (json.statusCode === 200 && json.data.length > 0) {
           setData(json.data[0]);
+          setNoDataMessage(null); // Clear any no-data message
         } else {
           setError("Failed to fetch data");
         }
@@ -131,12 +133,14 @@ export default function StationDetailsScreen() {
         const json = await response.json();
         console.log("GW API response:", json);
 
+        setNoDataMessage(null); // Clear any previous no-data message
+
         if (json.statusCode === 200) {
           console.log("Raw API data:", json.data);
           if (!json.data || json.data.length === 0) {
             console.log("No data returned from API");
             setChartData([]);
-            setError(
+            setNoDataMessage(
               "No groundwater data available for this station and time range"
             );
             return;
@@ -144,9 +148,9 @@ export default function StationDetailsScreen() {
           const processedData = processChartData(json.data, timeRange);
           console.log("Processed chart data:", processedData);
           if (processedData.length === 0) {
-            setError("No valid data points found after processing");
+            setNoDataMessage("No valid data points found after processing");
           } else {
-            setError(null); // Clear any previous errors
+            setNoDataMessage(null); // Clear any previous errors
           }
           setChartData(processedData);
         } else {
@@ -214,6 +218,7 @@ export default function StationDetailsScreen() {
 
     if (hasOverlap) {
       console.log("Time range has overlap with available data, fetching...");
+      setNoDataMessage(null); // Clear any previous no-data message
       fetchGWData(
         String(id),
         startTime,
@@ -224,7 +229,7 @@ export default function StationDetailsScreen() {
     } else {
       console.log("No overlap with available data range");
       setChartData([]);
-      setError(
+      setNoDataMessage(
         `No data available for selected time range. Station data available from ${dataStart.toLocaleDateString()} to ${dataEnd.toLocaleDateString()}`
       );
     }
@@ -240,6 +245,7 @@ export default function StationDetailsScreen() {
         setIsBooked(false);
         setSelectedTimeRange("1D");
         setChartData([]);
+        setNoDataMessage(null);
       };
     }, [])
   );
@@ -729,6 +735,12 @@ export default function StationDetailsScreen() {
                     {error}
                   </Text>
                 </View>
+              ) : noDataMessage ? (
+                <View className="justify-center items-center w-full h-full">
+                  <Text className="text-gray-500 text-sm text-center">
+                    {noDataMessage}
+                  </Text>
+                </View>
               ) : chartData.length === 0 ? (
                 <View className="justify-center items-center w-full h-full">
                   <Text className="text-gray-500 text-sm text-center">
@@ -875,50 +887,50 @@ export default function StationDetailsScreen() {
                       </ScrollView>
                     ) : (
                       <LineChart
-                          data={adaptiveChartData}
-                          width={
-                            Math.min(Dimensions.get("window").width - 40, 320) -
-                            20
-                          }
-                          height={200}
-                          spacing={Math.max(
-                            8,
-                            (Math.min(Dimensions.get("window").width - 40, 320) -
-                              40) /
+                        data={adaptiveChartData}
+                        width={
+                          Math.min(Dimensions.get("window").width - 40, 320) -
+                          20
+                        }
+                        height={200}
+                        spacing={Math.max(
+                          8,
+                          (Math.min(Dimensions.get("window").width - 40, 320) -
+                            40) /
                             Math.max(chartData.length, 1)
-                          )}
-                          thickness={2}
-                          color="#3b82f6"
-                          startFillColor="#3b82f6"
-                          endFillColor="#3b82f6"
-                          startOpacity={0.3}
-                          endOpacity={0.1}
-                          initialSpacing={8}
-                          endSpacing={8}
-                          yAxisColor="#9ca3af"
-                          xAxisColor="#9ca3af"
-                          yAxisThickness={1}
-                          xAxisThickness={1}
-                          rulesColor="#e5e7eb"
-                          rulesType="solid"
-                          yAxisTextStyle={{
-                            color: "#374151",
-                            fontSize: 11,
-                            fontWeight: "600",
-                          }}
-                          textFontSize={12}
-                          hideDataPoints={chartData.length > 12}
-                          dataPointsColor="#3b82f6"
-                          dataPointsRadius={2}
-                          showVerticalLines={false}
-                          showYAxisIndices={true}
-                          showXAxisIndices={true}
-                          xAxisIndicesHeight={3}
-                          yAxisIndicesWidth={3}
-                          adjustToWidth={false}
-                          maxValue={adaptiveMax}
-                          stepValue={adaptiveStep - 1}
-                          yAxisOffset={adaptiveMax + 5}
+                        )}
+                        thickness={2}
+                        color="#3b82f6"
+                        startFillColor="#3b82f6"
+                        endFillColor="#3b82f6"
+                        startOpacity={0.3}
+                        endOpacity={0.1}
+                        initialSpacing={8}
+                        endSpacing={8}
+                        yAxisColor="#9ca3af"
+                        xAxisColor="#9ca3af"
+                        yAxisThickness={1}
+                        xAxisThickness={1}
+                        rulesColor="#e5e7eb"
+                        rulesType="solid"
+                        yAxisTextStyle={{
+                          color: "#374151",
+                          fontSize: 11,
+                          fontWeight: "600",
+                        }}
+                        textFontSize={12}
+                        hideDataPoints={chartData.length > 12}
+                        dataPointsColor="#3b82f6"
+                        dataPointsRadius={2}
+                        showVerticalLines={false}
+                        showYAxisIndices={true}
+                        showXAxisIndices={true}
+                        xAxisIndicesHeight={3}
+                        yAxisIndicesWidth={3}
+                        adjustToWidth={false}
+                        maxValue={adaptiveMax}
+                        stepValue={adaptiveStep - 1}
+                        yAxisOffset={adaptiveMax + 5}
                       />
                     );
                   })()}
