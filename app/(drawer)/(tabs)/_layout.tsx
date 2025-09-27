@@ -21,35 +21,32 @@ const TabIcon = ({
   const { colorScheme } = useColorScheme();
   const theme = colorScheme === "dark" ? THEME.dark : THEME.light;
 
+  // Simple icon name logic
+  const displayIconName = focused
+    ? (iconName.replace("-outline", "") as keyof typeof Ionicons.glyphMap)
+    : iconName;
+
   return (
     <View className="flex-1 items-center justify-center p-1 min-w-[100px] h-full min-h-14">
       <View className="flex-col items-center justify-center h-full px-2 py-2 rounded-xl relative">
         <View className="items-center justify-center w-8 h-8 relative">
           <Ionicons
-            name={
-              focused
-                ? (iconName.replace(
-                    "-outline",
-                    ""
-                  ) as keyof typeof Ionicons.glyphMap)
-                : iconName
-            }
+            name={displayIconName}
             size={20}
             color={focused ? theme.primary : theme.mutedForeground}
           />
-          {badgeCount && badgeCount > 0 && (
+          {badgeCount ? (
             <View className="absolute -top-1 -right-1 bg-red-500 rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
               <Text className="text-white text-[10px] font-bold leading-none">
-                {badgeCount > 99 ? "99+" : badgeCount}
+                {badgeCount > 99 ? "99+" : badgeCount.toString()}
               </Text>
             </View>
-          )}
+          ) : null}
         </View>
-
         <Text
           className={cn(
             "text-[8px] font-semibold",
-            focused ? "text-primary" : "text-muted-foreground"
+            focused ? "text-primary" : "text-muted-foreground",
           )}
         >
           {title}
