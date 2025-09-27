@@ -46,7 +46,7 @@ const RegisterScreen = () => {
     } else {
       Alert.alert(
         "Registration Error",
-        result.error || "Registration failed. Please try again."
+        result.error || "Registration failed. Please try again.",
       );
     }
 
@@ -95,7 +95,7 @@ const RegisterScreen = () => {
           const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
           Alert.alert(
             "Rate Limited",
-            `Retrying OAuth in ${delay / 1000} seconds...`
+            `Retrying OAuth in ${delay / 1000} seconds...`,
           );
           setTimeout(() => handleGoogleSignup(retryCount + 1), delay);
           return;
@@ -106,7 +106,7 @@ const RegisterScreen = () => {
 
       const result = await WebBrowser.openAuthSessionAsync(
         `${loginUrl}`,
-        redirectUri
+        redirectUri,
       );
 
       if (result.type !== "success" || !result.url) {
@@ -129,7 +129,7 @@ const RegisterScreen = () => {
       ) {
         Alert.alert(
           "Connection Error",
-          "Please check your internet connection and try again. If the problem persists, try restarting the app."
+          "Please check your internet connection and try again. If the problem persists, try restarting the app.",
         );
       } else {
         Alert.alert("Google Registration Error", errorMessage);

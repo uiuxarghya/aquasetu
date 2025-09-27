@@ -23,7 +23,7 @@ export default function ProfileScreen() {
 
   // Settings state
   const [notificationSettings, setNotificationSettings] = useState(
-    notificationService.getSettings()
+    notificationService.getSettings(),
   );
   const [locationServices, setLocationServices] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -39,7 +39,7 @@ export default function ProfileScreen() {
   }, []);
 
   const updateNotificationSettings = async (
-    updates: Partial<typeof notificationSettings>
+    updates: Partial<typeof notificationSettings>,
   ) => {
     const newSettings = { ...notificationSettings, ...updates };
     setNotificationSettings(newSettings);

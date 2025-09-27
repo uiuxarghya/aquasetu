@@ -1,0 +1,31 @@
+{
+  "cli": {
+    "version": ">= 16.19.1"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "bundleIdentifier": "com.aarambh.aquasetu"
+      },
+      "env": {
+        "EXPO_PUBLIC_APPWRITE_PROJECT_ID": "@EXPO_PUBLIC_APPWRITE_PROJECT_ID",
+        "EXPO_PUBLIC_APPWRITE_PROJECT_NAME": "@EXPO_PUBLIC_APPWRITE_PROJECT_NAME",
+        "EXPO_PUBLIC_APPWRITE_ENDPOINT": "@EXPO_PUBLIC_APPWRITE_ENDPOINT",
+        "EXPO_PUBLIC_APPWRITE_DATABASE_ID": "@EXPO_PUBLIC_APPWRITE_DATABASE_ID",
+        "EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID": "@EXPO_PUBLIC_APPWRITE_USERS_COLLECTION_ID",
+        "EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN": "@EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN",
+        "EXPO_PUBLIC_GEOJSON_URL": "@EXPO_PUBLIC_GEOJSON_URL"
+      }
+    }
+  }
+}

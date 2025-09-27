@@ -1,33 +1,74 @@
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { View } from "react-native";
-import { WebView } from "react-native-webview";
+import { Text } from "@/components/ui/text";
 import * as Location from "expo-location";
+import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { Alert, View } from "react-native";
+import { WebView } from "react-native-webview";
 
 const MAPBOX_ACCESS_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN ?? "";
 const GEOJSON_URL = process.env.EXPO_PUBLIC_GEOJSON_URL ?? "";
 
+// Default coordinates (center of India)
+const DEFAULT_LATITUDE = 20.5937;
+const DEFAULT_LONGITUDE = 78.9629;
+
 export default function MapScreen() {
   const router = useRouter();
-  const [latitude, setLatitude] = useState<number>(78);
-  const [longitude, setLongitude] = useState<number>(22);
+  const [latitude, setLatitude] = useState<number>(DEFAULT_LATITUDE);
+  const [longitude, setLongitude] = useState<number>(DEFAULT_LONGITUDE);
   const [accuracy, setAccuracy] = useState<number>(0);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState<boolean>(true);
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.error("Permission to access location was denied");
+  const getCurrentLocation = useCallback(async () => {
+    try {
+      setIsLoadingLocation(true);
+      setLocationError(null);
+
+      // First check if location services are enabled
+      const locationServicesEnabled = await Location.hasServicesEnabledAsync();
+      if (!locationServicesEnabled) {
+        setLocationError(
+          "Location services are disabled. Please enable location services in your device settings.",
+        );
+        Alert.alert(
+          "Location Services Disabled",
+          "Please enable location services in your device settings to see your current location on the map.",
+          [
+            { text: "OK" },
+            {
+              text: "Retry",
+              onPress: getCurrentLocation,
+            },
+          ],
+        );
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest, // fine-grained accuracy
-      });
+      // Request permissions
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setLocationError(
+          "Location permission denied. You can still view the map with default location.",
+        );
+        Alert.alert(
+          "Location Permission Denied",
+          "Location permission is required to show your current location. You can still browse the map.",
+          [
+            { text: "OK" },
+            {
+              text: "Retry",
+              onPress: getCurrentLocation,
+            },
+          ],
+        );
+        return;
+      }
 
-      // console.log("Latitude:", location.coords.latitude);
-      // console.log("Longitude:", location.coords.longitude);
-      // console.log("Accuracy:", location.coords.accuracy, "meters");
+      // Get current position
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+      });
 
       setLatitude(location.coords.latitude);
       setLongitude(location.coords.longitude);
@@ -37,8 +78,35 @@ export default function MapScreen() {
       ) {
         setAccuracy(location.coords.accuracy);
       }
-    })();
+      setLocationError(null);
+    } catch (error) {
+      console.error("Location error:", error);
+      let errorMessage = "Unable to get your current location.";
+
+      if (error instanceof Error) {
+        if (error.message.includes("timeout")) {
+          errorMessage = "Location request timed out. Please try again.";
+        } else if (error.message.includes("unavailable")) {
+          errorMessage = "Location services are currently unavailable.";
+        }
+      }
+
+      setLocationError(errorMessage);
+      Alert.alert("Location Error", errorMessage, [
+        { text: "OK" },
+        {
+          text: "Retry",
+          onPress: getCurrentLocation,
+        },
+      ]);
+    } finally {
+      setIsLoadingLocation(false);
+    }
   }, []);
+
+  useEffect(() => {
+    getCurrentLocation();
+  }, [getCurrentLocation]);
 
   const html = `
   <!DOCTYPE html>
@@ -405,8 +473,8 @@ export default function MapScreen() {
                         .forEach((marker) => {
                           marker.remove();
                         });
-                    
-                        
+
+
                     map.flyTo({
                         center: [map_longitude, map_latitude],
                         zoom: Math.max(
@@ -415,7 +483,7 @@ export default function MapScreen() {
                         ),
                         essential: true,
                       });
-                    
+
                     const userLocation = document.createElement("div");
                       userLocation.className = "user-location-marker";
                       userLocation.innerHTML = "📍";
@@ -425,7 +493,7 @@ export default function MapScreen() {
                     const marker = new mapboxgl.Marker(userLocation)
                         .setLngLat([map_longitude, map_latitude])
                         .addTo(map);
-                    
+
                     // Add accuracy circle
                     if (map_accuracy < 1000) {
                       // Only show if accuracy is reasonable
@@ -734,6 +802,22 @@ export default function MapScreen() {
 
   return (
     <View className="flex-1 bg-background mb-14">
+      {isLoadingLocation && (
+        <View className="absolute top-4 left-4 right-4 z-10 bg-white/90 dark:bg-gray-800/90 rounded-lg p-3 shadow-lg">
+          <Text className="text-sm text-center text-muted-foreground">
+            Getting your location...
+          </Text>
+        </View>
+      )}
+
+      {locationError && (
+        <View className="absolute top-4 left-4 right-4 z-10 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 shadow-lg">
+          <Text className="text-sm text-center text-red-600 dark:text-red-400">
+            {locationError}
+          </Text>
+        </View>
+      )}
+
       <WebView
         source={{ html }}
         originWhitelist={["*"]}
