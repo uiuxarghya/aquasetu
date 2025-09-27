@@ -51,7 +51,7 @@ export default function Search() {
   };
 
   const [searchType, setSearchType] = useState<"GWATERLVL" | "RAINF">(
-    "GWATERLVL"
+    "GWATERLVL",
   );
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -164,7 +164,7 @@ export default function Search() {
           const data = await getTahsilList(
             selectedState,
             selectedDistrict,
-            searchType
+            searchType,
           );
           console.log("Tahsils loaded:", data);
           setTahsils(data || []);
@@ -208,7 +208,7 @@ export default function Search() {
             selectedState,
             selectedDistrict,
             selectedTahsil,
-            searchType
+            searchType,
           );
           setBlocks(data || []);
           // Reset dependent selections after a short delay
@@ -247,7 +247,7 @@ export default function Search() {
             "0",
             "0",
             selectedTahsil,
-            selectedBlock
+            selectedBlock,
           );
           setAgencies(data || []);
           // Reset dependent selections after a short delay
@@ -289,7 +289,7 @@ export default function Search() {
             selectedDistrict,
             selectedAgency,
             searchType,
-            selectedTelemetric
+            selectedTelemetric,
           );
 
           setSearchResults(data || []);
@@ -458,7 +458,7 @@ export default function Search() {
                           value: selectedDistrict,
                           label:
                             districts.find(
-                              (d) => d.district_id === selectedDistrict
+                              (d) => d.district_id === selectedDistrict,
                             )?.districtname || "",
                         }
                       : undefined

@@ -29,7 +29,7 @@ export default function BookmarksScreen() {
   useFocusEffect(
     React.useCallback(() => {
       fetchBookmarks();
-    }, [fetchBookmarks])
+    }, [fetchBookmarks]),
   );
 
   const handleDelete = async (station_code: string) => {

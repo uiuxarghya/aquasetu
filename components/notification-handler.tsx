@@ -11,7 +11,7 @@ export function NotificationHandler() {
       Notifications.addNotificationReceivedListener((notification) => {
         console.log(
           "Notification received in foreground:",
-          notification.request.content.title
+          notification.request.content.title,
         );
       });
 

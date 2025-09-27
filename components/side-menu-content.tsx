@@ -49,7 +49,7 @@ export default function SideMenuContent(props: any) {
             const list = await databases.listDocuments(
               DATABASE_ID,
               USERS_COLLECTION_ID,
-              [Query.equal("UserId", user.id)] as any
+              [Query.equal("UserId", user.id)] as any,
             );
 
             const doc = (list.documents || [])[0];

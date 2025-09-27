@@ -62,7 +62,7 @@ export default function GroundwaterAnalysis() {
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-      ])
+      ]),
     );
     pulse.start();
     return () => pulse.stop();
@@ -121,7 +121,7 @@ export default function GroundwaterAnalysis() {
     selectedRegion === "all"
       ? stations
       : stations.filter((station) =>
-          station.location.toLowerCase().includes(selectedRegion.toLowerCase())
+          station.location.toLowerCase().includes(selectedRegion.toLowerCase()),
         );
 
   return (
@@ -207,7 +207,7 @@ export default function GroundwaterAnalysis() {
                       {region === "all" ? "All Regions" : region}
                     </Text>
                   </TouchableOpacity>
-                )
+                ),
               )}
             </View>
           </View>
@@ -390,7 +390,6 @@ export default function GroundwaterAnalysis() {
                     ` (${monitoringStatus.dwlrNetwork.active} total active)`}
                 </CardDescription>
               </View>
-              
             </View>
           </CardHeader>
           <CardContent>

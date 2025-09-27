@@ -37,7 +37,7 @@ const LoginScreen = () => {
     } else {
       Alert.alert(
         "Login Error",
-        result.error || "Invalid email or password. Please try again."
+        result.error || "Invalid email or password. Please try again.",
       );
     }
 
@@ -86,7 +86,7 @@ const LoginScreen = () => {
           const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
           Alert.alert(
             "Rate Limited",
-            `Retrying OAuth in ${delay / 1000} seconds...`
+            `Retrying OAuth in ${delay / 1000} seconds...`,
           );
           setTimeout(() => handleGoogleLogin(retryCount + 1), delay);
           return;
@@ -97,7 +97,7 @@ const LoginScreen = () => {
 
       const result = await WebBrowser.openAuthSessionAsync(
         `${loginUrl}`,
-        redirectUri
+        redirectUri,
       );
 
       if (result.type !== "success" || !result.url) {
@@ -120,7 +120,7 @@ const LoginScreen = () => {
       ) {
         Alert.alert(
           "Connection Error",
-          "Please check your internet connection and try again. If the problem persists, try restarting the app."
+          "Please check your internet connection and try again. If the problem persists, try restarting the app.",
         );
       } else {
         Alert.alert("Google Login Error", errorMessage);
